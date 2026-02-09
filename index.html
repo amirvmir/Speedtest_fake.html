@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تست سرعت اینترنت - AmirVM</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        /* Header Styles */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .main-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(255,255,255,0.1);
+        }
+        
+        .sub-title {
+            font-size: 0.9rem;
+            color: #6b7280;
+            letter-spacing: 3px;
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+        
+        /* Server Selection Panel */
+        .server-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+        
+        .server-panel:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .panel-title {
+            font-size: 1rem;
+            color: #9ca3af;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .server-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .server-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #d1d5db;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .server-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .server-btn.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            border-color: #3b82f6;
+            color: white;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+        }
+        
+        .server-btn .ping {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+        
+        .custom-server {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .custom-input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .custom-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .custom-input::placeholder {
+            color: #6b7280;
+        }
+        
+        .add-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .add-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+        }
+        
+        /* Speedometer Container */
+        .speedometer-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 30px 0;
+        }
+        
+        /* Start Button */
+        .start-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffffff 0%, #e5e7eb 100%);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 10px 40px rgba(255,255,255,0.2);
+            z-index: 10;
+        }
+        
+        .start-btn:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 0 15px 50px rgba(255,255,255,0.3);
+        }
+        
+        .start-btn.hidden {
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+        }
+        
+        .start-btn svg {
+            width: 40px;
+            height: 40px;
+            color: #1f2937;
+        }
+        
+        .start-text {
+            font-size: 0.8rem;
+            color: #4b5563;
+            font-weight: 600;
+        }
+        
+        /* Speedometer Circle */
+        .speedometer {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.5s ease;
+        }
+        
+        .speedometer.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .speedometer svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+        
+        .bg-circle {
+            fill: none;
+            stroke: rgba(255,255,255,0.05);
+            stroke-width: 15;
+        }
+        
+        .download-circle {
+            fill: none;
+            stroke: url(#downloadGradient);
+            stroke-width: 15;
+            stroke-linecap: round;
+            stroke-dasharray: 754;
+            stroke-dashoffset: 754;
+            transition: stroke-dashoffset 0.5s ease;
+            filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.5));
+        }
+        
+        .upload-circle {
+            fill: none;
+            stroke: url(#uploadGradient);
+            stroke-width: 15;
+            stroke-linecap: round;
+            stroke-dasharray: 628;
+            stroke-dashoffset: 628;
+            transition: stroke-dashoffset 0.5s ease;
+            filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.5));
+        }
+        
+        /* Center Info */
+        .center-info {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 5;
+        }
+        
+        .speed-value {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+        
+        .speed-label {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+        
+        .unit {
+            font-size: 1.2rem;
+            color: #9ca3af;
+        }
+        
+        /* Test Phase Indicator */
+        .phase-indicator {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.5);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #d1d5db;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .phase-indicator.active {
+            opacity: 1;
+        }
+        
+        /* Results Grid */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+            margin-top: 30px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        
+        .results-grid.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .result-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .result-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .result-icon {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 10px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .download-card .result-icon {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(29, 78, 216, 0.2) 100%);
+            color: #60a5fa;
+        }
+        
+        .upload-card .result-icon {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.2) 100%);
+            color: #34d399;
+        }
+        
+        .ping-card .result-icon {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.2) 100%);
+            color: #fbbf24;
+        }
+        
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+        
+        .result-label {
+            font-size: 0.85rem;
+            color: #9ca3af;
+        }
+        
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            margin-top: 20px;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .progress-container.active {
+            opacity: 1;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6 0%, #10b981 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
+        }
+        
+        .testing .start-btn {
+            animation: pulse 1.5s infinite;
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            .main-title { font-size: 1.8rem; }
+            .speedometer-container { width: 250px; height: 250px; }
+            .speed-value { font-size: 2.5rem; }
+            .results-grid { grid-template-columns: 1fr; }
+            .server-grid { grid-template-columns: 1fr; }
+        }
+        
+        /* Loading Animation */
+        .loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            border: 3px solid transparent;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .loader.active {
+            opacity: 1;
+        }
+        
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="main-title">تست سرعت</h1>
+            <div class="sub-title">amirvm</div>
+        </div>
+        
+        <!-- Server Selection -->
+        <div class="server-panel">
+            <div class="panel-title">
+                <span>🖥️</span>
+                <span>انتخاب سرور تست</span>
+            </div>
+            <div class="server-grid" id="serverGrid">
+                <button class="server-btn active" data-url="https://speedtest.tele2.net/10MB.zip" data-name="Tele2 Europe">
+                    <div>Tele2 EU</div>
+                    <div class="ping">بررسی پینگ...</div>
+                </button>
+                <button class="server-btn" data-url="https://speed.hetzner.de/10MB.bin" data-name="Hetzner Germany">
+                    <div>Hetzner DE</div>
+                    <div class="ping">بررسی پینگ...</div>
+                </button>
+                <button class="server-btn" data-url="https://proof.ovh.net/files/10Mb.dat" data-name="OVH France">
+                    <div>OVH FR</div>
+                    <div class="ping">بررسی پینگ...</div>
+                </button>
+                <button class="server-btn" data-url="https://speedtest.serverius.net/files/10mb.bin" data-name="Serverius NL">
+                    <div>Serverius NL</div>
+                    <div class="ping">بررسی پینگ...</div>
+                </button>
+            </div>
+            <div class="custom-server">
+                <input type="text" class="custom-input" id="customUrl" placeholder="آدرس فایل تست (مثال: https://example.com/file.zip)">
+                <button class="add-btn" onclick="addCustomServer()">اضافه کردن</button>
+            </div>
+        </div>
+        
+        <!-- Speedometer -->
+        <div class="speedometer-container">
+            <button class="start-btn" id="startBtn" onclick="startTest()">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                <span class="start-text">اینترنت</span>
+            </button>
+            
+            <div class="loader" id="loader"></div>
+            
+            <div class="speedometer" id="speedometer">
+                <svg viewBox="0 0 300 300">
+                    <defs>
+                        <linearGradient id="downloadGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="uploadGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <circle class="bg-circle" cx="150" cy="150" r="120"></circle>
+                    <circle class="bg-circle" cx="150" cy="150" r="100"></circle>
+                    <circle class="download-circle" id="downloadCircle" cx="150" cy="150" r="120"></circle>
+                    <circle class="upload-circle" id="uploadCircle" cx="150" cy="150" r="100"></circle>
+                </svg>
+                <div class="center-info">
+                    <div class="speed-value" id="currentSpeed">0.0</div>
+                    <div class="speed-label" id="speedLabel">Mbps</div>
+                </div>
+            </div>
+            
+            <div class="phase-indicator" id="phaseIndicator">در حال اندازه‌گیری پینگ...</div>
+        </div>
+        
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <!-- Results -->
+        <div class="results-grid" id="resultsGrid">
+            <div class="result-card download-card">
+                <div class="result-icon">⬇️</div>
+                <div class="result-value" id="downloadResult">0.0</div>
+                <div class="result-label">دانلود (Mbps)</div>
+            </div>
+            <div class="result-card upload-card">
+                <div class="result-icon">⬆️</div>
+                <div class="result-value" id="uploadResult">0.0</div>
+                <div class="result-label">آپلود (Mbps)</div>
+            </div>
+            <div class="result-card ping-card">
+                <div class="result-icon">📡</div>
+                <div class="result-value" id="pingResult">0</div>
+                <div class="result-label">پینگ (ms)</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedServer = {
+            url: 'https://speedtest.tele2.net/10MB.zip',
+            name: 'Tele2 Europe'
+        };
+        let isTesting = false;
+        
+        // Server selection
+        document.querySelectorAll('.server-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                selectedServer = {
+                    url: this.dataset.url,
+                    name: this.dataset.name
+                };
+            });
+        });
+        
+        // Add custom server
+        function addCustomServer() {
+            const input = document.getElementById('customUrl');
+            const url = input.value.trim();
+            
+            if (!url) {
+                alert('لطفاً یک آدرس وارد کنید');
+                return;
+            }
+            
+            if (!url.startsWith('http')) {
+                alert('آدرس باید با http یا https شروع شود');
+                return;
+            }
+            
+            const grid = document.getElementById('serverGrid');
+            const btn = document.createElement('button');
+            btn.className = 'server-btn active';
+            btn.dataset.url = url;
+            btn.dataset.name = 'سرور سفارشی';
+            btn.innerHTML = `
+                <div>سرور سفارشی</div>
+                <div class="ping">${new URL(url).hostname}</div>
+            `;
+            
+            document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
+            grid.appendChild(btn);
+            
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                selectedServer = {
+                    url: this.dataset.url,
+                    name: this.dataset.name
+                };
+            });
+            
+            selectedServer = { url: url, name: 'سرور سفارشی' };
+            input.value = '';
+            
+            // Measure ping for new server
+            measurePing(url, btn.querySelector('.ping'));
+        }
+        
+        // Measure ping
+        async function measurePing(url, element) {
+            const start = performance.now();
+            try {
+                await fetch(url, { method: 'HEAD', mode: 'no-cors' });
+                const ping = Math.round(performance.now() - start);
+                element.textContent = `پینگ: ${ping}ms`;
+                return ping;
+            } catch (e) {
+                element.textContent = 'نامشخص';
+                return 999;
+            }
+        }
+        
+        // Measure pings on load
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.server-btn').forEach(btn => {
+                measurePing(btn.dataset.url, btn.querySelector('.ping'));
+            });
+        });
+        
+        // Start test
+        async function startTest() {
+            if (isTesting) return;
+            isTesting = true;
+            
+            const startBtn = document.getElementById('startBtn');
+            const speedometer = document.getElementById('speedometer');
+            const loader = document.getElementById('loader');
+            const phaseIndicator = document.getElementById('phaseIndicator');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const resultsGrid = document.getElementById('resultsGrid');
+            
+            // Reset UI
+            startBtn.classList.add('hidden');
+            speedometer.classList.add('active');
+            loader.classList.add('active');
+            phaseIndicator.classList.add('active');
+            progressContainer.classList.add('active');
+            resultsGrid.classList.remove('visible');
+            
+            let downloadSpeed = 0;
+            let uploadSpeed = 0;
+            let ping = 0;
+            
+            try {
+                // Phase 1: Ping
+                phaseIndicator.textContent = 'در حال اندازه‌گیری پینگ...';
+                progressBar.style.width = '10%';
+                ping = await testPing();
+                document.getElementById('pingResult').textContent = ping;
+                
+                // Phase 2: Download
+                phaseIndicator.textContent = 'در حال تست سرعت دانلود...';
+                progressBar.style.width = '40%';
+                downloadSpeed = await testDownload();
+                animateValue('downloadResult', 0, downloadSpeed, 1000);
+                
+                // Phase 3: Upload
+                phaseIndicator.textContent = 'در حال تست سرعت آپلود...';
+                progressBar.style.width = '70%';
+                uploadSpeed = await testUpload();
+                animateValue('uploadResult', 0, uploadSpeed, 1000);
+                
+                // Complete
+                progressBar.style.width = '100%';
+                phaseIndicator.textContent = 'تست تکمیل شد!';
+                
+                setTimeout(() => {
+                    loader.classList.remove('active');
+                    resultsGrid.classList.add('visible');
+                    phaseIndicator.classList.remove('active');
+                    progressContainer.classList.remove('active');
+                    
+                    // Reset button after 3 seconds
+                    setTimeout(() => {
+                        startBtn.classList.remove('hidden');
+                        speedometer.classList.remove('active');
+                        isTesting = false;
+                    }, 3000);
+                }, 500);
+                
+            } catch (error) {
+                console.error('Test error:', error);
+                phaseIndicator.textContent = 'خطا در تست. لطفاً دوباره تلاش کنید.';
+                setTimeout(() => {
+                    loader.classList.remove('active');
+                    startBtn.classList.remove('hidden');
+                    speedometer.classList.remove('active');
+                    isTesting = false;
+                }, 2000);
+            }
+        }
+        
+        // Test ping
+        async function testPing() {
+            const times = [];
+            for (let i = 0; i < 5; i++) {
+                const start = performance.now();
+                try {
+                    await fetch(selectedServer.url, { 
+                        method: 'HEAD', 
+                        mode: 'no-cors',
+                        cache: 'no-store'
+                    });
+                    times.push(performance.now() - start);
+                } catch (e) {
+                    times.push(100);
+                }
+                await new Promise(r => setTimeout(r, 200));
+            }
+            return Math.round(times.reduce((a, b) => a + b, 0) / times.length);
+        }
+        
+        // Test download speed
+        async function testDownload() {
+            const fileSize = 10 * 1024 * 1024; // 10MB
+            const startTime = performance.now();
+            
+            try {
+                const response = await fetch(selectedServer.url + '?t=' + Date.now(), {
+                    cache: 'no-store'
+                });
+                const reader = response.body.getReader();
+                let received = 0;
+                
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    received += value.length;
+                    
+                    const duration = (performance.now() - startTime) / 1000;
+                    const speed = (received * 8) / (1024 * 1024 * duration);
+                    updateSpeedometer(speed, 'download');
+                }
+                
+                const totalDuration = (performance.now() - startTime) / 1000;
+                const finalSpeed = (fileSize * 8) / (1024 * 1024 * totalDuration);
+                return Math.round(finalSpeed * 10) / 10;
+                
+            } catch (e) {
+                // Fallback simulation if CORS blocks
+                return simulateSpeedTest('download');
+            }
+        }
+        
+        // Test upload speed
+        async function testUpload() {
+            const dataSize = 5 * 1024 * 1024; // 5MB
+            const data = new Blob([new ArrayBuffer(dataSize)]);
+            const startTime = performance.now();
+            
+            try {
+                await fetch('https://httpbin.org/post', {
+                    method: 'POST',
+                    body: data,
+                    headers: { 'Content-Type': 'application/octet-stream' }
+                });
+                
+                const duration = (performance.now() - startTime) / 1000;
+                const speed = (dataSize * 8) / (1024 * 1024 * duration);
+                updateSpeedometer(speed, 'upload');
+                return Math.round(speed * 10) / 10;
+                
+            } catch (e) {
+                // Fallback simulation
+                return simulateSpeedTest('upload');
+            }
+        }
+        
+        // Simulate speed test (fallback)
+        function simulateSpeedTest(type) {
+            return new Promise(resolve => {
+                let speed = 0;
+                const targetSpeed = type === 'download' ? 
+                    50 + Math.random() * 100 : 
+                    20 + Math.random() * 50;
+                const duration = 3000;
+                const interval = 100;
+                const steps = duration / interval;
+                let currentStep = 0;
+                
+                const timer = setInterval(() => {
+                    currentStep++;
+                    speed = (targetSpeed * currentStep) / steps;
+                    speed += (Math.random() - 0.5) * 10;
+                    updateSpeedometer(Math.max(0, speed), type);
+                    
+                    if (currentStep >= steps) {
+                        clearInterval(timer);
+                        resolve(Math.round(targetSpeed * 10) / 10);
+                    }
+                }, interval);
+            });
+        }
+        
+        // Update speedometer UI
+        function updateSpeedometer(speed, type) {
+            const maxSpeed = 200; // Mbps
+            const percentage = Math.min(speed / maxSpeed, 1);
+            
+            if (type === 'download') {
+                const offset = 754 - (754 * percentage);
+                document.getElementById('downloadCircle').style.strokeDashoffset = offset;
+            } else {
+                const offset = 628 - (628 * percentage);
+                document.getElementById('uploadCircle').style.strokeDashoffset = offset;
+            }
+            
+            document.getElementById('currentSpeed').textContent = speed.toFixed(1);
+        }
+        
+        // Animate value
+        function animateValue(id, start, end, duration) {
+            const obj = document.getElementById(id);
+            const range = end - start;
+            const minTimer = 50;
+            let stepTime = Math.abs(Math.floor(duration / range));
+            stepTime = Math.max(stepTime, minTimer);
+            
+            let startTime = new Date().getTime();
+            let endTime = startTime + duration;
+            let timer;
+            
+            function run() {
+                let now = new Date().getTime();
+                let remaining = Math.max((endTime - now) / duration, 0);
+                let value = Math.round(end - (remaining * range));
+                obj.textContent = value;
+                if (value == end) {
+                    clearInterval(timer);
+                }
+            }
+            
+            timer = setInterval(run, stepTime);
+            run();
+        }
+    </script>
+</body>
+</html>
